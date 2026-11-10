@@ -1,0 +1,30 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.orderflow.sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/anthonysoltvedt/Projects/orderflow/.venv/bin/python</string>
+        <string>-u</string>
+        <string>/Users/anthonysoltvedt/Projects/orderflow/backend/auto_sync.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/anthonysoltvedt/Projects/orderflow</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/anthonysoltvedt/Projects/orderflow/backend/logs/launchd_stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/anthonysoltvedt/Projects/orderflow/backend/logs/launchd_stderr.log</string>
+</dict>
+</plist>

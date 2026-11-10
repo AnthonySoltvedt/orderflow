@@ -108,6 +108,10 @@ def import_order(order):
         else:
             print(f"Failed to import order #{order['id']}: {error.code}")
 
+    except urllib.error.URLError as error:
+        print(f"Cannot connect to OrderFlow: {error.reason}")
+        print(f"Order #{order['id']} was not imported.")
+
 
 # Import all three sample orders
 for order in sample_orders:
@@ -122,3 +126,13 @@ for order in sample_orders:
     }
 
     import_order(orderflow_order)
+
+
+# TEST: Order with missing customer name
+invalid_order = {
+    "id": 2004,
+    "customer": "",
+    "status": "Not Started"
+}
+
+import_order(invalid_order)

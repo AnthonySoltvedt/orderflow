@@ -13,3 +13,6 @@ frontend/dist/
 *.sqlite3
 *.xlsx
 *.csv
+# Application logs
+backend/logs/
+*.log
