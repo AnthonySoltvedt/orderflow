@@ -225,6 +225,33 @@ def get_my_profile(
     }
 
 
+# ORDER MONITORING - SUMMARY
+
+@app.get("/orders/summary")
+def get_order_summary(
+    user_id: int = Depends(get_current_user_id),
+):
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT status, COUNT(*)
+                FROM orders
+                WHERE owner_id = %s
+                GROUP BY status
+                """,
+                (user_id,),
+            )
+            rows = cursor.fetchall()
+
+    return {
+        "status_counts": {
+            status: count
+            for status, count in rows
+        }
+    }
+
+
 # GET ALL ORDERS - ONLY THE USER'S OWN ORDERS
 
 @app.get("/orders")
