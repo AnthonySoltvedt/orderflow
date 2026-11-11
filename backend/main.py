@@ -227,10 +227,13 @@ def get_my_profile(
 
 # ORDER MONITORING - SUMMARY
 
+	# ORDER MONITORING - SUMMARY
+
 @app.get("/orders/summary")
 def get_order_summary(
     user_id: int = Depends(get_current_user_id),
 ):
+    # Connect to PostgreSQL
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
@@ -242,13 +245,24 @@ def get_order_summary(
                 """,
                 (user_id,),
             )
+
             rows = cursor.fetchall()
 
+    # Initialise every order status with zero
+    status_counts = {
+        "Not Started": 0,
+        "Printing": 0,
+        "Printed": 0,
+        "Shipped": 0,
+    }
+
+    # Update counts using the database results
+    for status, count in rows:
+        status_counts[status] = count
+
+    # Return the summary as JSON
     return {
-        "status_counts": {
-            status: count
-            for status, count in rows
-        }
+        "status_counts": status_counts
     }
 
 

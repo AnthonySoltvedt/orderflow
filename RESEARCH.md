@@ -31,3 +31,58 @@ What I learned
 I gained a better understanding of SQL aggregation, FastAPI route ordering, reusing authentication dependencies and troubleshooting development server port conflicts.
 Next steps
 Introduce automated testing, improve the monitoring response and explore continuous integration using GitHub Actions.
+
+## Day 2 – 11 November 2026
+
+### Objective
+
+Introduce automated testing to improve the reliability and maintainability of the OrderFlow monitoring feature.
+
+### Why I chose Pytest
+
+I wanted to move beyond manually testing API endpoints through Swagger UI and introduce repeatable checks that could detect regressions as the application develops.
+
+I chose Pytest because it supports straightforward assertions, reusable fixtures and mocking, and can be integrated into automated CI pipelines.
+
+### Mocking the database
+
+I used fake database connections and cursors to test the order monitoring endpoint without modifying the real PostgreSQL database.
+
+This allowed me to provide predictable order counts and verify that the API returned the expected results.
+
+### Test-Driven Development
+
+I practised the Red–Green–Refactor approach when improving how the endpoint handles order statuses.
+
+**Red:** I wrote a test expecting all four statuses to appear, including those with zero orders. The test initially failed because the endpoint omitted statuses that had no matching database records.
+
+**Green:** I updated the endpoint to initialise all four statuses to zero before applying the database results. The new test passed.
+
+**Refactor:** I noticed duplicated fake database code in my tests, so I extracted it into reusable classes and a helper function.
+
+### Challenges encountered
+
+After changing the endpoint's response format, an earlier test failed because its expected output no longer matched the intended behaviour.
+
+I also accidentally changed the expected Printing count in another test. I compared the mocked input data, expected output and actual output to identify and correct both assertions.
+
+### Testing results
+
+Four automated tests passed:
+
+- Requests without authentication return HTTP 401.
+- Authenticated requests return the expected counts using mocked data.
+- All four order statuses appear in the response.
+- Users with no orders receive zero counts for every status.
+
+### Further investigation
+
+The testing environment produced a Starlette deprecation warning related to HTTPX. The tests still passed, but I plan to investigate dependency compatibility.
+
+I also recognise that mocked tests do not replace integration tests against PostgreSQL.
+
+### What I learned
+
+I developed a stronger understanding of automated testing, mocking, regression testing, edge cases and Test-Driven Development.
+
+I also learned that test failures require investigation rather than simply changing assertions to make them pass.
