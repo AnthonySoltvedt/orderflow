@@ -86,3 +86,45 @@ I also recognise that mocked tests do not replace integration tests against Post
 I developed a stronger understanding of automated testing, mocking, regression testing, edge cases and Test-Driven Development.
 
 I also learned that test failures require investigation rather than simply changing assertions to make them pass.
+
+## Day 3 – 12 November 2026
+
+### Objective
+
+Introduce Continuous Integration using GitHub Actions so that OrderFlow's automated tests run whenever code is pushed to GitHub.
+
+### Why I chose GitHub Actions
+
+GitHub Actions integrates directly with my Git repository and allows me to automate software testing without manually running commands on my local computer.
+
+### Implementation
+
+I created `.github/workflows/tests.yml` to configure an automated workflow that:
+
+- Runs when code is pushed or a pull request is opened.
+- Uses a GitHub-hosted Linux environment.
+- Installs Python 3.12 and project dependencies.
+- Checks Python syntax.
+- Executes the automated Pytest test suite.
+
+### Challenge encountered
+
+The first workflow failed during test collection because the application's JWT secret key was missing in GitHub's environment.
+
+Although the tests worked locally, GitHub Actions did not have access to the environment variables stored on my development machine.
+
+### Solution
+
+I investigated the workflow logs and identified the missing `JWT_SECRET_KEY`.
+
+I configured a dummy test-only JWT key for the Pytest step rather than exposing my real secret.
+
+After committing and pushing this change, the second workflow run completed successfully.
+
+### What I learned
+
+I learned how Continuous Integration works, how to configure GitHub Actions and how to investigate failures using workflow logs.
+
+I also developed a better understanding of environment variables and why software can behave differently between local and remote environments.
+
+The workflow now provides automated feedback whenever changes are pushed to the repository.
