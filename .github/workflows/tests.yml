@@ -27,4 +27,6 @@ jobs:
         run: python -m py_compile backend/main.py
 
       - name: Run automated tests
+        env:
+          JWT_SECRET_KEY: "CI_TEST_ONLY_NOT_FOR_PRODUCTION_1234567890_ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         run: python -m pytest tests/test_order_summary.py -v
