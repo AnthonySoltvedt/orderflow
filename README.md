@@ -1,125 +1,13 @@
-# OrderFlow
-
-**A full-stack order management and monitoring application built using Python, FastAPI, PostgreSQL and React.**
-
-## Overview
-
-OrderFlow is a software development project designed to explore how businesses can manage orders more efficiently through software and automation.
-
-The application allows authenticated users to manage their orders, track order statuses and retrieve a summary showing how many orders are at each stage.
-
-For the Enterprise Automation Services technical challenge, I extended my existing OrderFlow project by introducing order monitoring, automated testing and a Continuous Integration (CI) pipeline.
-
-## The Problem
-
-Businesses managing multiple orders need a simple way to understand their workload.
-
-Without a clear overview, it can be difficult to see how many orders are waiting to be processed, currently in production or ready for dispatch.
-
-OrderFlow addresses this by providing an API that organises and summarises order information.
-
-## Technologies
-
-- **Backend:** Python, FastAPI
-- **Database:** PostgreSQL
-- **Frontend:** React, JavaScript
-- **Authentication:** JWT and Argon2 password hashing
-- **Automated testing:** Pytest, FastAPI TestClient
-- **Continuous Integration:** GitHub Actions
-- **Version control:** Git and GitHub
-
-## Features
-
-### Order Management
-
-- Create and retrieve orders
-- Update order statuses
-- Delete orders
-- Store order information in PostgreSQL
-- Associate orders with authenticated users
-
-### Authentication
-
-- User registration and login
-- JWT-based authentication
-- Password hashing
-- Protected API endpoints
-
-### Order Monitoring
-
-The monitoring API allows authenticated users to view their order counts by status.
-
-**Endpoint:** `GET /orders/summary`
-
-Example response:
-
-```json
-{
-  "status_counts": {
-    "Not Started": 3,
-    "Printing": 2,
-    "Printed": 0,
-    "Shipped": 1
-  }
-}
-```
-
-The endpoint groups orders by status and returns zero counts for statuses without matching orders.
-
-The database query filters orders by the authenticated user's ID.
-
-### WooCommerce Automation
-
-- Process sample WooCommerce order data
-- Extract and store order information
-- Prevent duplicate orders during processing
-
-## Technical Challenge Development
-
-### Day 1 – API Development
-
-Added an authenticated order monitoring endpoint using FastAPI and PostgreSQL.
-
-Tested the endpoint manually using Swagger UI.
-
-### Day 2 – Automated Testing
-
-Introduced Pytest to verify the order monitoring feature.
-
-Created four automated tests covering:
-
-1. Authentication requirements
-2. Correct order counts
-3. Missing statuses
-4. Users with no orders
-
-Used mocked database connections to isolate tests from the real PostgreSQL database.
-
-Practised Test-Driven Development using the Red–Green–Refactor approach.
-
-### Day 3 – Continuous Integration
-
-Implemented a GitHub Actions workflow that automatically runs checks when code is pushed or a pull request is opened.
-
-The workflow:
-
-1. Checks out the repository
-2. Installs Python 3.12
-3. Installs the development dependencies
-4. Checks Python syntax
-5. Runs the automated tests
-
-The first CI run failed because a required JWT environment variable was missing.
-
-After investigating the workflow logs, I configured a test-only JWT secret. The subsequent workflow completed successfully.
-
 ## Installation and Testing
 
 ### Prerequisites
 
+Before starting, make sure you have installed:
+
 - Python 3.12
-- PostgreSQL for database-backed application features
-- Node.js and npm for the React frontend
+- PostgreSQL
+- Node.js and npm
+- Git
 
 ### 1. Clone the repository
 
@@ -129,48 +17,136 @@ cd orderflow
 git checkout feature/eas-order-monitoring
 ```
 
-### 2. Create a virtual environment
+### 2. Create a Python virtual environment
+
+Create a virtual environment:
 
 ```bash
 python -m venv .venv
+```
+
+Activate it (macOS/Linux):
+
+```bash
 source .venv/bin/activate
 ```
 
-### 3. Install development dependencies
+### 3. Install Python dependencies
+
+Install the application and testing dependencies:
 
 ```bash
 python -m pip install -r requirements-dev.txt
 ```
 
-### 4. Configure environment variables
+### 4. Set up PostgreSQL
 
-Use `.env.example` as a reference for the required environment variables.
-
-The backend requires a PostgreSQL connection string and a JWT secret of at least 48 characters.
-
-Do not commit real credentials or private environment files.
-
-### 5. Run the automated tests
+Create a new PostgreSQL database:
 
 ```bash
-python -m pytest tests/test_order_summary.py -v
+createdb orderflow_db
 ```
 
-The four order summary tests use mocked database responses and do not require a running PostgreSQL server, provided the required application environment configuration is supplied.
+Create the required database tables:
 
-### 6. Start the backend
+```bash
+psql -d orderflow_db -v ON_ERROR_STOP=1 -f schema.sql
+```
 
-After configuring PostgreSQL and the necessary environment variables:
+This creates two tables:
+
+- `users` – stores user accounts and hashed passwords.
+- `orders` – stores orders, their statuses and their associated owners.
+
+The schema has been successfully tested against a fresh PostgreSQL database.
+
+**Note:** If `orderflow_db` already exists, do not create it again.
+
+### 5. Configure environment variables
+
+OrderFlow uses environment variables for its database connection and JWT authentication.
+
+Create a local `.env` file using `.env.example` as a reference.
+
+Example:
+
+```dotenv
+DATABASE_URL=postgresql://USERNAME:PASSWORD@HOST:5432/orderflow_db
+JWT_SECRET_KEY=REPLACE_WITH_A_SECURE_RANDOM_SECRET_AT_LEAST_48_CHARACTERS
+```
+
+Replace these placeholders with your own configuration.
+
+The JWT secret must contain at least 48 characters.
+
+Never commit real credentials or private `.env` files to Git.
+
+### 6. Run automated tests
+
+Execute the Pytest test suite:
+
+```bash
+JWT_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(48))')" python -m pytest tests/test_order_summary.py -v
+```
+
+This runs four automated tests covering:
+
+1. Authentication requirements.
+2. Correct order counts.
+3. Statuses with zero orders.
+4. Users with no orders.
+
+These tests use mocked database connections, so a running PostgreSQL database is not required for the order summary tests.
+
+The command generates a temporary JWT secret for the test process.
+
+### 7. Start the FastAPI backend
+
+After configuring PostgreSQL and your environment variables, start the backend:
 
 ```bash
 uvicorn backend.main:app --reload
 ```
 
-FastAPI's interactive API documentation is available at:
+The backend normally runs at:
 
-`http://127.0.0.1:8000/docs`
+http://127.0.0.1:8000
 
-A PostgreSQL database with the application's required tables must be configured before using the database-backed endpoints.
+FastAPI's interactive API documentation (Swagger UI) is available at:
+
+http://127.0.0.1:8000/docs
+
+Swagger UI can be used to test registration, login, order management and order monitoring.
+
+### 8. Start the React frontend
+
+Open a second terminal in the project directory.
+
+Navigate to the frontend:
+
+```bash
+cd frontend
+```
+
+Install the JavaScript dependencies:
+
+```bash
+npm install
+```
+
+Start the Vite development server:
+
+```bash
+npm run dev
+```
+
+The frontend normally runs at:
+
+http://localhost:5173/
+
+Keep the FastAPI backend running in its separate terminal when using features that require the API.
+
+### Day 3 – Continuous Integration
 
 ## Continuous Integration
 
