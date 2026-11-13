@@ -128,3 +128,37 @@ I learned how Continuous Integration works, how to configure GitHub Actions and 
 I also developed a better understanding of environment variables and why software can behave differently between local and remote environments.
 
 The workflow now provides automated feedback whenever changes are pushed to the repository.
+
+## Day 4 – 13 November 2026
+
+### Objective
+
+Verify that OrderFlow works correctly beyond mocked automated tests by testing the real application against PostgreSQL.
+
+### Testing performed
+
+I confirmed that all four Pytest tests passed locally, the React frontend built successfully and Oxlint reported no errors or warnings.
+
+I then performed an end-to-end API test using FastAPI's Swagger UI.
+
+I registered a new test account, logged in and verified JWT authentication using `GET /me`.
+
+Next, I created order `90001` with the status `Not Started`. The order-monitoring endpoint correctly returned one order in that status.
+
+I updated the order to `Printing` using the status update endpoint.
+
+When I requested the summary again, it correctly returned zero `Not Started` orders and one `Printing` order.
+
+### Results
+
+The test confirmed that authentication, order creation, database persistence, status updates and order monitoring work together.
+
+### What I learned
+
+I learned the difference between tests using mocked dependencies and end-to-end API testing against a real database.
+
+I also gained experience validating a complete user workflow and checking that a database change is correctly reflected in an API response.
+
+### Limitations
+
+The React user interface was not included in this end-to-end test. Testing with a second authenticated user would also provide stronger evidence of data isolation.
